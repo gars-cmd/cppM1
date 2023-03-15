@@ -12,9 +12,16 @@ typedef struct AdptArray_ {
     PRINT_FUNC print_function;
 } AdptArray;
 
+// this function is used to initialize the data in a block of PElement
+void initializeMemory(int old_index , int new_index, PElement* memory_block){
+    for (size_t i = old_index; i < new_index ; i++) {
+        memory_block[i]= NULL;
+    }
+}
 
 PAdptArray CreateAdptArray(COPY_FUNC copy_function, DEL_FUNC delete_function, PRINT_FUNC print_function){
     PAdptArray new_arr = (PAdptArray) malloc(sizeof(AdptArray));
+    // maybe an error can occur
     if (new_arr == NULL) {
         return NULL;
     }
@@ -32,9 +39,11 @@ void DeleteAdptArray(PAdptArray arr){
     if (arr == NULL ) {
         printf("In delete function the given array is empty");
     } else {
-        for (int i = 0  ; i < arr->curr_size; i++) {
+        for (int i = 0  ; i < arr->capacity; i++) {
             if (arr->mem_block[i] != NULL) {
                 arr->delete_function(arr->mem_block[i]);
+            }else{
+                free(arr->mem_block[i]);
             }
         }
     }
@@ -43,22 +52,27 @@ void DeleteAdptArray(PAdptArray arr){
 }
 
 Result SetAdptArrayAt(PAdptArray arr, int position, PElement to_insert) {
-    if (arr == NULL || position < 0) {
+    // NON-authorized argument
+    if (position < 0) {
         return FAIL;
     }
     if (position >= arr->capacity) {
+        // during an expansion of the memory block we exand it up to the double of the given position
         int new_capacity = ( position + 1 ) * 2;
         PElement* new_mem_block = (PElement*) realloc(arr->mem_block, new_capacity * sizeof(PElement));
+        initializeMemory(arr->capacity, new_capacity, new_mem_block);
         if (new_mem_block == NULL) {
             return FAIL;
         }
         arr->mem_block = new_mem_block;
         arr->capacity = new_capacity;
     }
+    // if there is already something there, we replace it
     if (arr->mem_block[position] != NULL) {
         arr->delete_function(arr->mem_block[position]);
     }
     arr->mem_block[position] = arr->copy_function(to_insert);
+    // the new position is above our last(position) element
     if (position > arr->curr_size) {
         arr->curr_size = position + 1;
     }
@@ -94,4 +108,10 @@ void PrintDB(PAdptArray arr){
 }
 
 
+// Ressources used for this Assignement 
+// -------------------------------------
+// https://youtu.be/6Ir4l0VuI7Y
+// https://youtu.be/6c1nCsbwUEk
+// matseget tirgul 11 of C course 
+// https://stackoverflow.com/questions/2141277/how-to-zero-out-new-memory-after-realloc
 
