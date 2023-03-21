@@ -37,7 +37,6 @@ PAdptArray CreateAdptArray(COPY_FUNC copy_function, DEL_FUNC delete_function, PR
 
 void DeleteAdptArray(PAdptArray arr){
     if (arr == NULL ) {
-        printf("In delete function the given array is empty");
     } else {
         for (int i = 0  ; i < arr->capacity; i++) {
             if (arr->mem_block[i] != NULL) {
@@ -98,11 +97,12 @@ int GetAdptArraySize(PAdptArray arr ) {
 
 void PrintDB(PAdptArray arr){
     if (arr == NULL) {
-        printf("in function PrintDB : the input arr is empty");
     }
-    for (size_t i = 0; i < arr->curr_size; i++) {
-        if (arr->mem_block[i] != NULL) {
-            arr->print_function(arr->mem_block[i]);
+    else{
+        for (size_t i = 0; i < arr->curr_size; i++) {
+            if (arr->mem_block[i] != NULL) {
+                arr->print_function(arr->mem_block[i]);
+            }
         }
     }
 }
